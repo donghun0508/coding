@@ -54,4 +54,8 @@ public class Product {
         }
         stockQuantity += quantity;
     }
+
+    public double getBasePrice() {
+        return this.price == null ? 0.0 : this.price.doubleValue();
+    }
 }

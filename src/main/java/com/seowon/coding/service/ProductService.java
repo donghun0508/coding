@@ -80,18 +80,13 @@ public class ProductService {
         if (productIds == null || productIds.isEmpty()) {
             throw new IllegalArgumentException("empty productIds");
         }
-        for (Long id : productIds) {
-            Product p = productRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found: " + id));
 
-            double base = p.getPrice() == null ? 0.0 : p.getPrice().doubleValue();
-            double changed = base + (base * (percentage / 100.0));
-            if (includeTax) {
-                changed = changed * 1.1;
-            }
-            BigDecimal newPrice = BigDecimal.valueOf(changed).setScale(2, RoundingMode.HALF_UP);
-            p.setPrice(newPrice);
-            productRepository.save(p);
+        List<Product> products = productRepository.findAllById(productIds);
+        for (Product product : products) {
+            double basePrice = product.getBasePrice();
+            BigDecimal newPrice = productPriceChange.calculate(basePrice, percentage, includeTax);
+            product.setPrice(newPrice);
         }
+        productRepository.saveAll(products);
     }
 }
