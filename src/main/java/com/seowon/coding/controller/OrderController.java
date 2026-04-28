@@ -4,6 +4,7 @@ import com.seowon.coding.domain.model.Order;
 import com.seowon.coding.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,4 +68,14 @@ public class OrderController {
      * }
      */
     //
+
+    @PostMapping
+    public ResponseEntity<OrderPlaceResponse> placeOrder(@RequestBody OrderPlaceRequest request) {
+        try {
+            Order order = orderService.placeOrder(request.customerName(), request.customerEmail(), request.productIds(), request.quantities());
+            return ResponseEntity.status(HttpStatus.CREATED).body(OrderPlaceResponse.of(order));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
