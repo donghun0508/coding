@@ -78,6 +78,16 @@ public class Order {
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    public void calculateTotalAmount(String couponCode) {
+        BigDecimal shipping = this.totalAmount.compareTo(new BigDecimal("100.00")) >= 0 ? BigDecimal.ZERO : new BigDecimal("5.00");
+        BigDecimal discount = (couponCode != null && couponCode.startsWith("SALE")) ? new BigDecimal("10.00") : BigDecimal.ZERO;
+
+        BigDecimal totalAmount = this.totalAmount.add(shipping).subtract(discount);
+
+        setTotalAmount(totalAmount);
+    }
+
+
     public void markAsProcessing() {
         this.status = OrderStatus.PROCESSING;
     }
