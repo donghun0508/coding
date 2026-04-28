@@ -1,6 +1,10 @@
 package com.seowon.coding.domain.model;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.Builder;
 
 import java.util.List;
@@ -19,24 +23,17 @@ class PermissionChecker {
             List<UserGroup> groups,
             List<Policy> policies
     ) {
-        for (User user : users) {
-            if (user.id.equals(userId)) {
-                for (String groupId : user.groupIds) {
-                    for (UserGroup group : groups) {
-                        if (group.id.equals(groupId)) {
-                            for (String policyId : group.policyIds) {
-                                for (Policy policy : policies) {
-                                    if (policy.id.equals(policyId)) {
-                                        for (Statement statement : policy.statements) {
-                                            if (statement.actions.contains(targetAction) &&
-                                                statement.resources.contains(targetResource)) {
-                                                return true;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+
+        Map<String, List<String>> userMap = users.stream().collect(Collectors.toMap(u -> u.id, u -> u.groupIds));
+        Map<String, List<String>> groupMap = groups.stream().collect(Collectors.toMap(ug -> ug.id, ug -> ug.policyIds));
+        Map<String, List<Statement>> policyMap = policies.stream().collect(Collectors.toMap(p -> p.id, p -> p.statements));
+
+        for (String userGroup : userMap.getOrDefault(userId, new ArrayList<>())) {
+            for (String policy : groupMap.getOrDefault(userGroup, new ArrayList<>())) {
+                for (Statement statement : policyMap.getOrDefault(policy, new ArrayList<>())) {
+                    if (statement.actions.contains(targetAction) &&
+                        statement.resources.contains(targetResource)) {
+                        return true;
                     }
                 }
             }
