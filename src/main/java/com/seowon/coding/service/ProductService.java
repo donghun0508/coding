@@ -1,6 +1,7 @@
 package com.seowon.coding.service;
 
 import com.seowon.coding.domain.model.Product;
+import com.seowon.coding.domain.model.ProductPriceChange;
 import com.seowon.coding.domain.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,8 @@ import java.util.Optional;
 public class ProductService {
     
     private final ProductRepository productRepository;
-    
+    private final ProductPriceChange productPriceChange;
+
     @Transactional(readOnly = true)
     public List<Product> getAllProducts() {
         return productRepository.findAll();
@@ -55,7 +57,7 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public List<Product> findProductsByCategory(String category) {
-        return List.of();
+        return productRepository.findByCategory(category);
     }
 
     /**
